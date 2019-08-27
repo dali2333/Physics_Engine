@@ -27,7 +27,9 @@ namespace GameEngine
         public static char[,] l7 = { { '#', '#', '#', '#' }, { '#', '#', '#', '#' } };
         public static char[,] l8 = { { '#', '#' },{ '#', '#' }, { '#', '#' },{ '#', '#' } };
         public static char[,] l9 = { { '$' }, { '$' } };
-        public static char[,] l10 = { { '#', '#', '#', '#' }, { '#', '#', '#', '#' }, { '#', '#', '#', '#' }, { '#', '#', '#', '#' } };
+        public static char[,] l10 = { { 'A', '#', '#', '#' }, { 'B', '#', '#', '#' }, { '#', '#', '#', '#' }, { '#', '#', '#', '#' } };
+
+        public static char[,] background = new char[120,50];
 
         static void Pretreatment()
         {
@@ -41,6 +43,11 @@ namespace GameEngine
                 l6[0 ,i] = '!';
                 l6[1 ,i] = '!';
                 l6[2, i] = '!';
+            }
+
+            for (int i = 0; i < 120; i++)
+            {
+                //background[i, 20] = 'K';
             }
         }
 
@@ -62,6 +69,8 @@ namespace GameEngine
 
             //初始化显示器
             Window.Loading(120, 50);
+
+            Window.BackGround = background; //背景图片
 
             //载入物体
             float Elastic = 0.8f; float Friction = 0.5f;
@@ -93,8 +102,15 @@ namespace GameEngine
             KeyBoard.Control_Obj("A");
 
             //启动 -> 显示器 物理效果 键盘输入
-            Parallel.Invoke(() => Window.Start_Up(), () => Physics.Start_Up(), () => KeyBoard.Start_Up());
-            
+            //Parallel.Invoke(() => Window.Start_Up(), () => Physics.Start_Up(), () => KeyBoard.Start_Up());
+
+            //Graph.WriteFile("A.txt", "l10", l10);
+            //Graph.ReadFile("A.txt");
+            //Console.ReadKey();
+
+            Graph.Add_String(l10, Convert.ToString(12.3));
+            Graph.Show_Look(l10);
+            Console.ReadKey();
         }
     }
 }
