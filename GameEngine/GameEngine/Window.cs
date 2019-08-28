@@ -72,7 +72,6 @@ namespace GameEngine
         private static Stopwatch Frame_Watch = new Stopwatch(); //帧率计时器
         public static long Refresh_Dely = 20; //每帧输出时间ms fps = 1000/Refresh_Dely
 
-
         public static char[,] BackGround; //背景画面
         
         public static Dictionary<string,GameOBJ> All_Obj = new Dictionary<string, GameOBJ>(10); //所有物体

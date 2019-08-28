@@ -23,7 +23,7 @@ namespace GameEngine
                 Console.Write('\n');
             }
         }
-        public static void Add_String(char[,] look, string s, int x=0, int y=0) //将字符串绘制到图片上 超出图片的部分不显示
+        public static void Add_String(char[,] look, string s, int x = 0, int y = 0) //将字符串绘制到图片上 超出图片的部分不显示
         {
             if (y < look.GetLength(1))
             {
@@ -43,9 +43,8 @@ namespace GameEngine
             {
                 look[x + i, y] = s[i];
             }
-
         }
-        public static void Add_String_H(char[,] look, string s) //默认0，0
+        public static void Add_String_H(char[,] look, string s)
         {
             for (int i = 0; i < s.Length; i++)
             {
@@ -53,9 +52,51 @@ namespace GameEngine
             }
 
         }
+        public static void Mix_Graph(char[,] look, char[,] g, int x = 0, int y = 0) //将图片叠加
+        {
+            if (y < look.GetLength(1))
+            {
+                for (int i = 0; i < g.GetLength(0); i++)
+                {
+                    for (int j = 0; j < g.GetLength(1); j++)
+                    {
+                        if (x + i < look.GetLength(0))
+                        {
+                            look[x + i, y + j] = g[i, j];
+                        }
+
+                    }
+                }
+            }
+
+        }
+        public static void Mix_Graph_H(char[,] look, char[,] g, int x, int y) //图片快速叠加(超出图片会报错)
+        {
+            for (int i = 0; i < g.GetLength(0); i++)
+            {
+                for (int j = 0; j < g.GetLength(1); j++)
+                {
+                    look[x + i, y + j] = g[i, j];
+
+                }
+            }
+            
+        }
+        public static void Mix_Graph_H(char[,] look, char[,] g)
+        {
+            for (int i = 0; i < g.GetLength(0); i++)
+            {
+                for (int j = 0; j < g.GetLength(1); j++)
+                {
+                    look[i, j] = g[i, j];
+
+                }
+            }
+
+        }
 
         //文件操作
-        public static string Graph_Path = @"C:\Users\liush\source\repos\Physics_Engine\Graph\"; //进行操作的位置
+        public static string Graph_Path; //进行操作的位置
         public static Dictionary<string, char[,]> ReadFile(string filename) //读取图片文件
         {
             using (System.IO.StreamReader file = new System.IO.StreamReader(Graph_Path + filename))
@@ -95,10 +136,10 @@ namespace GameEngine
             {
                 file.WriteLine("-----");
                 file.WriteLine("" + name + " " + look.GetLength(0).ToString() + " " + look.GetLength(1).ToString());
-
-                for (int i = 0; i < look.GetLength(0); i++)
+                
+                for (int j = 0; j < look.GetLength(1); j++)
                 {
-                    for (int j = 0; j < look.GetLength(1); j++)
+                    for (int i = 0; i < look.GetLength(0); i++)
                     {
                         file.Write(look[i, j]);
                     }
@@ -118,6 +159,15 @@ namespace GameEngine
 
         }
 
+        //高级方法
+        public static void Loading(string path="") //输入path后每次调用都以该目录为基准，不然每次用全局路径也行
+        {
+            Graph_Path = path;
+        }
 
+        public static void Add_File_To_Graphs(string name) //将文件中的图片添加到缓存中
+        {
+            ReadFile(name).ToList().ForEach(x => All_Graphs.Add(x.Key, x.Value));
+        }
     }
 }
