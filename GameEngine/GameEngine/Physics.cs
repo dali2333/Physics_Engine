@@ -19,8 +19,7 @@ namespace GameEngine
         public static float Global_Max_Speed = 100f;
 
         private static readonly Stopwatch Physics_Time_Watch = new Stopwatch(); //演算时长计时器
-        private static readonly float Physics_Interval_Time = 0.05f; //两次计算的间隔时间s
-        private static long Physics_Interval_Time_m = 50; //两次计算的间隔时间ms
+        private static float Physics_Interval_Time = 0.05f; //两次计算的间隔时间s
         private static readonly Timer Physics_Timer = new Timer(Equal_Interval_Callback, null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan); //演算定时器
 
         public static bool Made_Obj(string name, int x,int y,int sx,int sy,char[,]look) //创建物体
@@ -166,8 +165,6 @@ namespace GameEngine
 
         private static void Equal_Interval_Callback(object state) //等时间间隔计算
         {
-            //Physics_Time_Watch.Restart();
-
             Parallel.ForEach(Window.All_Obj.Values, (obj) =>
             {
 
@@ -221,14 +218,11 @@ namespace GameEngine
 
             });
 
-            /*
-            if(Physics_Time_Watch.ElapsedMilliseconds > Physics_Interval_Time_m) //计算过慢时
-            {
-                //Console.Write(Physics_Time_Watch.ElapsedMilliseconds); Console.SetCursorPosition(0, 0);
-            }
-            */
+            //Graph.Add_String(Graph.All_Graphs["V"], "        ");Graph.Add_String(Graph.All_Graphs["V"], Physics_Time_Watch.ElapsedMilliseconds.ToString());
 
-            //Console.Write(Physics_Time_Watch.ElapsedMilliseconds); Console.SetCursorPosition(0, 0);
+            Physics_Interval_Time = (float)Physics_Time_Watch.ElapsedMilliseconds / 1000;
+
+            Physics_Time_Watch.Restart();
         }
 
         private static void Main_Loop() //主循环 用作特殊效果
@@ -242,8 +236,6 @@ namespace GameEngine
         }
         public static void Start_Up()
         {
-            //初始化
-            Physics_Interval_Time_m = (long)Physics_Interval_Time * 1000;
             //启动定时器
             Physics_Timer.Change(TimeSpan.Zero, TimeSpan.FromSeconds(Physics_Interval_Time));
             //主循环

@@ -70,7 +70,7 @@ namespace GameEngine
         private static bool Switch_Buffer = true; //双重缓存切换
 
         private static readonly Stopwatch Frame_Watch = new Stopwatch(); //帧率计时器
-        public static readonly long Refresh_Dely = 20; //每帧输出时间ms fps = 1000/Refresh_Dely
+        public static readonly long Refresh_Dely = 30; //每帧输出时间ms fps = 1000/Refresh_Dely
 
         public static char[,] BackGround; //背景画面
         
@@ -102,6 +102,82 @@ namespace GameEngine
             }
         }
 
+        private static bool If_Show_Prerendered_Frame = true; //是否输出预渲染
+        public static void Stop_Prerendered() //强行打断预渲染
+        {
+            If_Show_Prerendered_Frame = false;
+        }
+        public static void Show_Prerendered_Frame(string path,long refresh_dely=30) //输出预渲染画面
+        {
+            If_Show_Prerendered_Frame = true;
+
+            foreach (string f in Graph.Read_Prerendered_Frame(path))
+            {
+                if (!If_Show_Prerendered_Frame)
+                {
+                    break;
+                }
+
+                Frame_Watch.Restart();
+
+                Console.Write(f);
+
+                Console.Write("This Is Prerendered Frame "+ Frame_Watch.ElapsedMilliseconds.ToString());
+
+                Console.SetCursorPosition(0, 0);
+
+                if (Frame_Watch.ElapsedMilliseconds <= refresh_dely)
+                {
+                    Thread.Sleep((ushort)(refresh_dely - Frame_Watch.ElapsedMilliseconds));
+                }
+
+            }
+
+            Console.Clear();
+        }
+        public static void Out_Prerendered_Frame(string filename,int n) //输出画面到文件(和物理效果同时打开才有动作)
+        {
+            Switch_Buffer = true;
+            Dictionary<string, char[,]> graph = new Dictionary<string, char[,]>();
+            
+
+            for (int ii = 0; ii < n; ii++)
+            {
+                Frame_Watch.Restart();
+
+                Synthetic_Cache();
+
+                char[,] BB = new char[Size_X, Size_Y];
+                Array.Copy(Window_Buffer_1, BB, BB.Length);
+                graph.Add("PF" + ii.ToString(), BB);
+
+                Window_Buffer.Clear();
+                for (int i = 0; i < Window_Buffer_1.GetLength(1); i++)
+                {
+                    for (int j = 0; j < Window_Buffer_1.GetLength(0); j++)
+                    {
+                        Window_Buffer.Append(Window_Buffer_1[j, i]);
+                    }
+                }
+                Console.Write(Window_Buffer);
+
+                Console.Write("Prerendered:" + ii.ToString());
+                Console.SetCursorPosition(0, 0);
+
+                if (Frame_Watch.ElapsedMilliseconds <= Refresh_Dely)
+                {
+                    Thread.Sleep((ushort)(Refresh_Dely - Frame_Watch.ElapsedMilliseconds));
+                }
+                
+            }
+
+            Console.Clear();
+            Console.WriteLine("Output Frame...");
+
+            Graph.WriteFile(filename, graph);
+            
+            Console.WriteLine("Output Completed!");
+        }
 
         private static void Show_Buffer() //缓存输出到画面
         {

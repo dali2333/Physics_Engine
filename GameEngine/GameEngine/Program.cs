@@ -77,12 +77,21 @@ namespace GameEngine
             //动画绑定物体的贴图(均为名称,先构建物体再绑定.动画与物体1对1,不可重复)
             Graph.Binding_Animation_To_Obj("An1", "A");
             Graph.Binding_Animation_To_Obj("An2", "B");
+            //Graph.Delete_Binding_Animation("B"); //解除绑定
             //启动动画系统
             Graph.Enable_Animation = true;
 
+            //预渲染画面并保存到文件 Out_Prerendered_Frame(文件名,总渲染帧数) 与Physics.Start_Up()同时运行才有物理效果
+            //Parallel.Invoke(() => Window.Out_Prerendered_Frame("Prerendered_Frame1.txt", 200), () => Physics.Start_Up(), () => KeyBoard.Start_Up());
+
+            //从文件输出预渲染画面 Show_Prerendered_Frame(文件名,帧时间) PS:帧时间比渲染时的Refresh_Dely大画面将变慢,反之亦然
+            Window.Show_Prerendered_Frame("Prerendered_Frame1.txt",10);
+            //Window.Stop_Prerendered() //输出预渲染中调用以强行停止
+
+
             //启动 -> 显示器 物理效果 键盘输入
             Parallel.Invoke(() => Window.Start_Up(), () => Physics.Start_Up(), () => KeyBoard.Start_Up());
-
+            
         }
     }
 }

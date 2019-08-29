@@ -79,7 +79,7 @@ namespace GameEngine
         //所有存储的动画
         public static Dictionary<string, Animation> All_Animations = new Dictionary<string, Animation>();
         //动画绑定物体
-        private static List<string[]> Binding_Obj = new List<string[]>();
+        private static readonly List<string[]> Binding_Obj = new List<string[]>();
         
         public static void Load_Animation(string name,string path) //创建并添加动画
         {
@@ -91,6 +91,11 @@ namespace GameEngine
             {
                 Binding_Obj.Add(new string[] { animation_name, obj_name });
             }
+
+        }
+        public static void Delete_Binding_Animation(string obj_name) //解除绑定动画
+        {
+            Binding_Obj.Remove(Binding_Obj.FirstOrDefault(t => t[1] == obj_name));
 
         }
 
@@ -117,8 +122,7 @@ namespace GameEngine
 
                 }
 
-                //Add_String(All_Graphs["V"], "        ");
-                //Add_String(All_Graphs["V"], Animation_Watch.ElapsedMilliseconds.ToString());
+                //Add_String(All_Graphs["V"], "        ");Add_String(All_Graphs["V"], Animation_Watch.ElapsedMilliseconds.ToString());
 
                 Animation_Watch.Restart();
             }
@@ -241,6 +245,33 @@ namespace GameEngine
                 return All_Data;
             }
                 
+        }
+        public static string[] Read_Prerendered_Frame(string filename) //读取预渲染文件
+        {
+            using (System.IO.StreamReader file = new System.IO.StreamReader(Graph_Path + filename))
+            {
+                List<string> fms = new List<string>();
+
+                string line;
+                while ((line = file.ReadLine()) != null)
+                {
+                    if (line == "-----")
+                    {
+                        string[] message = file.ReadLine().Split(' ');
+                        string L = "";
+
+                        for (int i = 0; i < int.Parse(message[2]); i++)
+                        {
+                            L += file.ReadLine();
+                        }
+
+                        fms.Add(L);
+                    }
+                }
+
+                return fms.ToArray(); ;
+            }
+
         }
         public static void WriteFile(string filename, string name, char[,] look,bool append=true) //写入一张图片 append=false是覆盖写入,true是接在下方
         {
