@@ -18,10 +18,10 @@ namespace GameEngine
         //全局最大速度
         public static float Global_Max_Speed = 100f;
 
-        private static Stopwatch Physics_Time_Watch = new Stopwatch(); //演算时长计时器
-        private static float Physics_Interval_Time = 0.05f; //两次计算的间隔时间s
+        private static readonly Stopwatch Physics_Time_Watch = new Stopwatch(); //演算时长计时器
+        private static readonly float Physics_Interval_Time = 0.05f; //两次计算的间隔时间s
         private static long Physics_Interval_Time_m = 50; //两次计算的间隔时间ms
-        private static Timer Physics_Timer = new Timer(Equal_Interval_Callback, null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan); //演算定时器
+        private static readonly Timer Physics_Timer = new Timer(Equal_Interval_Callback, null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan); //演算定时器
 
         public static bool Made_Obj(string name, int x,int y,int sx,int sy,char[,]look) //创建物体
         {
@@ -231,11 +231,12 @@ namespace GameEngine
             //Console.Write(Physics_Time_Watch.ElapsedMilliseconds); Console.SetCursorPosition(0, 0);
         }
 
-        private static void Main_Loop() //主循环 用作环境规则控制
+        private static void Main_Loop() //主循环 用作特殊效果
         {
             while (true)
             {
-                
+                Graph.Animation_Out(); //输出动画
+
                 Thread.Sleep(100);
             }
         }

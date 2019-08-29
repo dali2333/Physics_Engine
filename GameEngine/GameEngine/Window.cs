@@ -69,8 +69,8 @@ namespace GameEngine
         private static char[,] Window_Buffer_1; //原始缓冲区
         private static bool Switch_Buffer = true; //双重缓存切换
 
-        private static Stopwatch Frame_Watch = new Stopwatch(); //帧率计时器
-        public static long Refresh_Dely = 20; //每帧输出时间ms fps = 1000/Refresh_Dely
+        private static readonly Stopwatch Frame_Watch = new Stopwatch(); //帧率计时器
+        public static readonly long Refresh_Dely = 20; //每帧输出时间ms fps = 1000/Refresh_Dely
 
         public static char[,] BackGround; //背景画面
         

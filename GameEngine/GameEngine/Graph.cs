@@ -1,15 +1,128 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace GameEngine
 {
     static class Graph
     {
+        //动画类
+        public class Animation
+        {
+            public string Name = ""; //名称
+
+            public int X = 0; //尺寸
+            public int Y = 0;
+
+            public int Length; //帧数
+
+            private char[][,] All_Frame;//全部帧
+
+            public Animation(string name,string path)
+            {
+                Name = name;
+
+                Dictionary<string, char[,]> fms = Graph.ReadFile(path);
+                char[,] kvp = fms.FirstOrDefault().Value;
+                X = kvp.GetLength(0);
+                Y = kvp.GetLength(1);
+                Length = fms.Count;
+                All_Frame = new char[fms.Count][ ,];
+
+                int n = 0;
+                foreach(char[,]c in fms.Values)
+                {
+                    All_Frame[n] = new char[kvp.GetLength(0), kvp.GetLength(1)];
+                    for (int i=0;i< c.GetLength(0); i++)
+                    {
+                        for (int j = 0; j < c.GetLength(1); j++)
+                        {
+                             All_Frame[n][i,j] = c[i,j];
+                        }
+
+                    }
+                    
+                    n++;
+                }
+
+                Enum_Frame = GetEnumerator();
+            }
+
+            private IEnumerator<char[,]> GetEnumerator()
+            {
+                while (true)
+                {
+                    for (int i = 0; i < Length; i++)
+                    {
+                        yield return All_Frame[i];
+                    }
+                }
+                
+            }
+            private IEnumerator<char[,]> Enum_Frame;
+            public char[,] Get_Next_Frame() //循环获取帧
+            {
+                Enum_Frame.MoveNext();
+                
+                return Enum_Frame.Current;
+            }
+
+        }
+
         //所有存储的图片
         public static Dictionary<string, char[,]> All_Graphs = new Dictionary<string, char[,]>();
+        //所有存储的动画
+        public static Dictionary<string, Animation> All_Animations = new Dictionary<string, Animation>();
+        //动画绑定物体
+        private static List<string[]> Binding_Obj = new List<string[]>();
+        
+        public static void Load_Animation(string name,string path) //创建并添加动画
+        {
+            All_Animations[name] = new Animation(name,path);
+        }
+        public static void Binding_Animation_To_Obj(string animation_name, string obj_name) //动画绑定物体的贴图(均为名称,先构建物体再绑定.动画与物体1对1,不可重复)
+        {
+            if(All_Animations.ContainsKey(animation_name) && Window.All_Obj.ContainsKey(obj_name))
+            {
+                Binding_Obj.Add(new string[] { animation_name, obj_name });
+            }
+
+        }
+
+
+        private static readonly Stopwatch Animation_Watch = new Stopwatch(); //帧率计时器
+        private static readonly int Animation__Interval_Time = 500; //动画输出间隔ms(不保证准确输出间隔)
+        public static bool Enable_Animation = false; //启动动画
+
+        public static void Animation_Out() //逐帧输出动画(非同步变化)
+        {
+            if (Enable_Animation) 
+            {
+                Parallel.ForEach(Binding_Obj, (b) =>
+                {
+                    Window.All_Obj[b[1]].Look = All_Animations[b[0]].Get_Next_Frame();
+                });
+                
+                if (Animation_Watch.ElapsedMilliseconds <= Animation__Interval_Time)
+                {
+                    Thread.Sleep((ushort)(Animation__Interval_Time - Animation_Watch.ElapsedMilliseconds));
+                }
+                else
+                {
+
+                }
+
+                //Add_String(All_Graphs["V"], "        ");
+                //Add_String(All_Graphs["V"], Animation_Watch.ElapsedMilliseconds.ToString());
+
+                Animation_Watch.Restart();
+            }
+        }
 
         //图片操作
         public static void Show_Look(char[,] Look) //显示图片
@@ -163,11 +276,14 @@ namespace GameEngine
         public static void Loading(string path="") //输入path后每次调用都以该目录为基准，不然每次用全局路径也行
         {
             Graph_Path = path;
+            Enable_Animation = false;
         }
 
         public static void Add_File_To_Graphs(string name) //将文件中的图片添加到缓存中
         {
             ReadFile(name).ToList().ForEach(x => All_Graphs.Add(x.Key, x.Value));
         }
+        
+        
     }
 }
