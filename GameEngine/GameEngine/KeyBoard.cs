@@ -12,6 +12,7 @@ namespace GameEngine
         public static string Pressed_Key; //按下的键值
         public static int KeyBoard_Delay = 10; //按键延迟
 
+        private static bool Is_Open = true;
         private static bool Is_Control_Obj = false; //键盘是否绑定控制对象
         public static GameOBJ Controlling_Obj; //控制中的对象
         public static bool Control_Obj(string name) //绑定对象
@@ -31,6 +32,11 @@ namespace GameEngine
         public static void Stop_Control_Obj() //解除绑定
         {
             Is_Control_Obj = false;
+        }
+
+        public static void Stop() //停止运行
+        {
+            Is_Open = false;
         }
 
         private static void Key_Down()
@@ -57,6 +63,30 @@ namespace GameEngine
                         Controlling_Obj.Move(1, 0);
                         break;
 
+                    case "S":
+                        Physics.Restart_Physics();
+                        break;
+                    case "D":
+                        Physics.Stop_Physics();
+                        break;
+                    case "F":
+                        Graph.Enable_Animation = true;
+                        break;
+                    case "G":
+                        Graph.Enable_Animation = false;
+                        break;
+                    case "A":
+                        Physics.Restart_Game_Time();
+                        break;
+                    case "Escape":
+
+                        if (Window.If_Show_Prerendered_Frame)
+                        {
+                            Window.Stop_Prerendered();
+                            Stop();
+                        }
+                        break;
+
                     default: break;
                 }
             }
@@ -76,7 +106,7 @@ namespace GameEngine
 
         private static void Main_Loop() //主循环
         {
-            while (true)
+            while (Is_Open)
             {
                 Pressed_Key = Console.ReadKey(true).Key.ToString();
 
@@ -87,7 +117,7 @@ namespace GameEngine
         }
         public static void Start_Up()
         {
-            
+            Is_Open = true;
             //主循环
             Main_Loop();
         }

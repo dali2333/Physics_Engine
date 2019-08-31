@@ -23,7 +23,10 @@ namespace GameEngine
         {
             
         }
-        
+        static void Alarm(long t,long real_t) //闹钟事件 t是设置的时间,real_t是实际触发的时间
+        {
+            
+        }
 
         static void Main(string[] args)
         {
@@ -42,7 +45,7 @@ namespace GameEngine
             Physics.Made_Obj("O", 0, 0, 8, 1, Graph.All_Graphs["V"]); Physics.Change_Obj_Physics_S("O", false, false);
 
             Physics.Made_Obj("A", 20, 34, 3, 3, Graph.All_Graphs["l"]); //外观和形状
-            Physics.Change_Obj_Physics("A", 1f, 40, 0, 0,0, Elastic, Friction);//物理性质
+            Physics.Change_Obj_Physics("A", 1f, 10, 0, 0,0, Elastic, Friction);//物理性质
             Physics.Change_Obj_Physics_S("A", true,true);//可移动性和可碰撞性开关
 
             Physics.Made_Obj("B", 40, 20, 3, 3, Graph.All_Graphs["l"]);  Physics.Change_Obj_Physics("B", 1f, 10, -10, 0, 0, Elastic, Friction); Physics.Change_Obj_Physics_S("B", true, true);
@@ -67,7 +70,8 @@ namespace GameEngine
             //注册事件
             Physics.Touched += new Physics.OBJTouch_Events(Get_Touched); //碰撞事件
             Physics.Out_Of_Bounds += new Physics.OBJOut_Events(Out_Border); //物体超出屏幕事件
-            
+            Physics.Alarm_Clock += new Physics.Alarm_Events(Alarm); //闹钟响应事件
+
             //键盘绑定物体
             KeyBoard.Control_Obj("A"); //参数是被控制物体的名称
 
@@ -85,13 +89,30 @@ namespace GameEngine
             //Parallel.Invoke(() => Window.Out_Prerendered_Frame("Prerendered_Frame1.txt", 200), () => Physics.Start_Up(), () => KeyBoard.Start_Up());
 
             //从文件输出预渲染画面 Show_Prerendered_Frame(文件名,帧时间) PS:帧时间比渲染时的Refresh_Dely大画面将变慢,反之亦然
-            Window.Show_Prerendered_Frame("Prerendered_Frame1.txt",10);
-            //Window.Stop_Prerendered() //输出预渲染中调用以强行停止
+            //Window.Show_Prerendered_Frame("Prerendered_Frame1.txt",10);
+            //Window.Stop_Prerendered() //输出预渲染中调用可以强行停止
 
+            //添加闹钟(ms) PS:闹钟时间如果小于 Physics.Main_Loop_Sleep*2 可能会不触发
+            Physics.Add_Alarm(5000);//5秒钟触发
+            Physics.Add_Alarm(2000);
+            //Physics.Delete_Alarm(1000);//删除闹钟
+            //Physics.Clean_Alarm();//清空闹钟
+            //Physics.Alarm_Open = false;//关闭闹钟
 
+            //Physics.Stop_Physics();//暂停物理演算
+            //Physics.Restart_Physics() //重新开始物理演算
+            //Physics.Get_Game_Time() //获取游戏运行时间(ms)
+            //Physics.Restart_Game_Time() //重新计算游戏运行时间
+
+            //Thread.Sleep(2000);
+
+            //演示一段预渲染画面,按Esc跳过
+            Parallel.Invoke(() => Window.Show_Prerendered_Frame("Prerendered_Frame1.txt", 10, "Press esc to exit..."), () => KeyBoard.Start_Up());
+            
             //启动 -> 显示器 物理效果 键盘输入
             Parallel.Invoke(() => Window.Start_Up(), () => Physics.Start_Up(), () => KeyBoard.Start_Up());
-            
+
+
         }
     }
 }

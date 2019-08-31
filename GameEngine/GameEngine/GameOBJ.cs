@@ -18,7 +18,7 @@ namespace GameEngine
         //外观性质
         public bool Visible = true;//可见性
         public char[,] Look;//外观
-        public string Name;//索引名称
+        public string Name;//名称
         //物理性质
         public bool Movable = true; //可移动性(关闭不移动物体的可移动性可以提升性能)
         public bool Collisible = true; //可碰撞性

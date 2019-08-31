@@ -80,7 +80,7 @@ namespace GameEngine
         public static Dictionary<string, Animation> All_Animations = new Dictionary<string, Animation>();
         //动画绑定物体
         private static readonly List<string[]> Binding_Obj = new List<string[]>();
-        
+
         public static void Load_Animation(string name,string path) //创建并添加动画
         {
             All_Animations[name] = new Animation(name,path);
@@ -251,15 +251,16 @@ namespace GameEngine
             using (System.IO.StreamReader file = new System.IO.StreamReader(Graph_Path + filename))
             {
                 List<string> fms = new List<string>();
-
-                string line;
+                
+                string line;string siz="0 0";
                 while ((line = file.ReadLine()) != null)
                 {
                     if (line == "-----")
                     {
                         string[] message = file.ReadLine().Split(' ');
                         string L = "";
-
+                        siz = message[1] +" "+ message[2];
+                        
                         for (int i = 0; i < int.Parse(message[2]); i++)
                         {
                             L += file.ReadLine();
@@ -269,7 +270,9 @@ namespace GameEngine
                     }
                 }
 
-                return fms.ToArray(); ;
+                fms.Add(siz);
+
+                return fms.ToArray();
             }
 
         }

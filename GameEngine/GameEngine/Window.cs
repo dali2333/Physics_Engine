@@ -102,16 +102,24 @@ namespace GameEngine
             }
         }
 
-        private static bool If_Show_Prerendered_Frame = true; //是否输出预渲染
+        public static bool If_Show_Prerendered_Frame = true; //是否输出预渲染
         public static void Stop_Prerendered() //强行打断预渲染
         {
             If_Show_Prerendered_Frame = false;
         }
-        public static void Show_Prerendered_Frame(string path,long refresh_dely=30) //输出预渲染画面
+        public static void Show_Prerendered_Frame(string path,long refresh_dely=30,string show_while_out="") //输出预渲染画面
         {
             If_Show_Prerendered_Frame = true;
 
-            foreach (string f in Graph.Read_Prerendered_Frame(path))
+            string[] frames = Graph.Read_Prerendered_Frame(path);
+            string[] vv = frames.Last().Split(' ');
+
+            Console.WindowWidth = Convert.ToInt32(vv[0]);
+            Console.WindowHeight = Convert.ToInt32(vv[1]) + 1;
+            Console.BufferWidth = Convert.ToInt32(vv[0]);
+            Console.BufferHeight = Convert.ToInt32(vv[1]) + 1;
+
+            foreach (string f in frames)
             {
                 if (!If_Show_Prerendered_Frame)
                 {
@@ -122,7 +130,7 @@ namespace GameEngine
 
                 Console.Write(f);
 
-                Console.Write("This Is Prerendered Frame "+ Frame_Watch.ElapsedMilliseconds.ToString());
+                Console.Write("Press esc to exit " + Frame_Watch.ElapsedMilliseconds.ToString());
 
                 Console.SetCursorPosition(0, 0);
 
@@ -134,6 +142,13 @@ namespace GameEngine
             }
 
             Console.Clear();
+
+            Console.WindowWidth = Size_X;
+            Console.WindowHeight = Size_Y + 1;
+            Console.BufferWidth = Size_X;
+            Console.BufferHeight = Size_Y + 1;
+
+            Console.Write(show_while_out);
         }
         public static void Out_Prerendered_Frame(string filename,int n) //输出画面到文件(和物理效果同时打开才有动作)
         {
@@ -207,7 +222,7 @@ namespace GameEngine
             Console.Write(Window_Buffer);
             Console.SetCursorPosition(0, 0);
         }
-        private static void Synthetic_Cache() //绘制画面到缓存
+        private static void Synthetic_Cache() //绘制画面到缓存( '\0'为透明 )
         {
             if (Switch_Buffer)
             {
@@ -222,7 +237,11 @@ namespace GameEngine
                         {
                             for (int j = 0; j < obj.Look.GetLength(0); j++)
                             {
-                                Window_Buffer_1[j + (int)obj.X, i + (int)obj.Y] = obj.Look[j,i];
+                                if(obj.Look[j, i] != '\0')
+                                {
+                                    Window_Buffer_1[j + (int)obj.X, i + (int)obj.Y] = obj.Look[j, i];
+                                }
+                                
                             }
                         }
                     }
