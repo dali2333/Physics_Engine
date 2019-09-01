@@ -11,7 +11,6 @@ using System.Windows.Input;
 
 namespace GameEngine
 {
-    
     class Program
     {
         //所有事件(高频调用，不要阻塞)
@@ -25,25 +24,99 @@ namespace GameEngine
         }
         static void Alarm(long t,long real_t) //闹钟事件 t是设置的时间,real_t是实际触发的时间
         {
-            
+
         }
+
+        static void Key_Down(string Pressed_Key) //键盘按下事件 Pressed_Key为键值
+        {
+            
+            if (KeyBoard.Is_Control_Obj) //绑定了物体
+            {
+                switch (Pressed_Key)
+                {
+                    case "0": break;
+
+                    case "UpArrow":
+                        //Controlling_Obj.Speed_Y += -5;
+                        KeyBoard.Controlling_Obj.Move(0, -1);
+                        break;
+                    case "DownArrow":
+                        KeyBoard.Controlling_Obj.Move(0, 1);
+                        break;
+                    case "LeftArrow":
+                        KeyBoard.Controlling_Obj.Move(-1, 0);
+                        break;
+                    case "RightArrow":
+                        KeyBoard.Controlling_Obj.Move(1, 0);
+                        break;
+
+                    case "S":
+                        Physics.Restart_Physics();
+                        break;
+                    case "D":
+                        Physics.Stop_Physics();
+                        break;
+                    case "F":
+                        Graph.Start_Animation();
+                        break;
+                    case "G":
+                        Graph.Close_Animation();
+                        break;
+                    case "A":
+                        Physics.Restart_Game_Time();
+                        break;
+                    case "Escape":
+                        if (Window.If_Show_Prerendered_Frame)
+                        {
+                            //结束预渲染
+                            Window.Stop_Prerendered();
+                            KeyBoard.Close();
+                        }
+                        else
+                        {
+                            //结束全部进程
+                            Physics.Close();
+                            Window.Close();
+                            KeyBoard.Close();
+                        }
+                        break;
+
+                    default: break;
+                }
+            }
+            else //没绑定物体
+            {
+                switch (Pressed_Key)
+                {
+                    case "0": break;
+
+                    default: break;
+                }
+            }
+
+        }
+
 
         static void Main(string[] args)
         {
             //加载图像
             Graph.Loading(@"C:\Users\liush\source\repos\Physics_Engine\Graph\"); //存放数据的文件夹，后面读取和写入使用的地址都是从它开始
-            
+
             Graph.Add_File_To_Graphs("A.txt"); //读取该文件内的图片并存在Graph.All_Graphs中
+            //Graph.WriteFile();//将图片写入到文件中
 
             //初始化显示器
             Window.Loading(120, 50);
+
+            //背景图片 PS:没有内容需填充空格,不修改自动空格 不能透明
+            //Window.BackGround;
 
             //载入物体
             float Elastic = 0.8f; float Friction = 0.5f; //直接Change_Obj_Physics带数就行,这里是为了方便
 
             //用于显示文字的标签
             Physics.Made_Obj("O", 0, 0, 8, 1, Graph.All_Graphs["V"]); Physics.Change_Obj_Physics_S("O", false, false);
-
+            //物体
             Physics.Made_Obj("A", 20, 34, 3, 3, Graph.All_Graphs["l"]); //外观和形状
             Physics.Change_Obj_Physics("A", 1f, 10, 0, 0,0, Elastic, Friction);//物理性质
             Physics.Change_Obj_Physics_S("A", true,true);//可移动性和可碰撞性开关
@@ -67,13 +140,21 @@ namespace GameEngine
             Physics.Global_GX = 0;
             Physics.Global_Max_Speed = 100f; //全局最大速度
 
+            //键盘绑定物体
+            KeyBoard.Control_Obj("A"); //参数是被控制物体的名称
+            //KeyBoard.Stop_Control_Obj();//解绑物体
+            //KeyBoard.KeyBoard_Delay=10;//按键后延迟ms
+            
             //注册事件
             Physics.Touched += new Physics.OBJTouch_Events(Get_Touched); //碰撞事件
             Physics.Out_Of_Bounds += new Physics.OBJOut_Events(Out_Border); //物体超出屏幕事件
             Physics.Alarm_Clock += new Physics.Alarm_Events(Alarm); //闹钟响应事件
 
-            //键盘绑定物体
-            KeyBoard.Control_Obj("A"); //参数是被控制物体的名称
+            KeyBoard.KeyDowm += new KeyBoard.KeyDowm_Events(Key_Down); //按键响应事件
+
+
+            //物理演算主循环的特殊效果延迟ms PS:闹钟、动画...
+            //Physics.Main_Loop_Sleep = 100;
 
             //加载动画(一个文件一个动画)
             Graph.Load_Animation("An1", "An1.txt"); 
@@ -82,8 +163,8 @@ namespace GameEngine
             Graph.Binding_Animation_To_Obj("An1", "A");
             Graph.Binding_Animation_To_Obj("An2", "B");
             //Graph.Delete_Binding_Animation("B"); //解除绑定
-            //启动动画系统
-            Graph.Enable_Animation = true;
+            Graph.Start_Animation();//启动动画系统
+            //Graph.Close_Animation();//关闭动画系统
 
             //预渲染画面并保存到文件 Out_Prerendered_Frame(文件名,总渲染帧数) 与Physics.Start_Up()同时运行才有物理效果
             //Parallel.Invoke(() => Window.Out_Prerendered_Frame("Prerendered_Frame1.txt", 200), () => Physics.Start_Up(), () => KeyBoard.Start_Up());
@@ -97,21 +178,28 @@ namespace GameEngine
             Physics.Add_Alarm(2000);
             //Physics.Delete_Alarm(1000);//删除闹钟
             //Physics.Clean_Alarm();//清空闹钟
-            //Physics.Alarm_Open = false;//关闭闹钟
+            //Physics.Close_Alarm();//关闭闹钟
 
             //Physics.Stop_Physics();//暂停物理演算
             //Physics.Restart_Physics() //重新开始物理演算
             //Physics.Get_Game_Time() //获取游戏运行时间(ms)
             //Physics.Restart_Game_Time() //重新计算游戏运行时间
 
-            //Thread.Sleep(2000);
+            //Window.Start_Up();//启动Window进程
+            //Physics.Start_Up();//启动Physics进程
+            //KeyBoard.Start_Up();//启动键盘进程
+            //Window.Close();//结束Window进程 PS:结束后需等待一会才能再次启动
+            //Physics.Close();//结束Physics进程
+            //KeyBoard..Close();//结束键盘进程
+
+
+            //Thread.Sleep(1000); //正式启动前最好暂停一小会等待数据加载
 
             //演示一段预渲染画面,按Esc跳过
             Parallel.Invoke(() => Window.Show_Prerendered_Frame("Prerendered_Frame1.txt", 10, "Press esc to exit..."), () => KeyBoard.Start_Up());
-            
+
             //启动 -> 显示器 物理效果 键盘输入
             Parallel.Invoke(() => Window.Start_Up(), () => Physics.Start_Up(), () => KeyBoard.Start_Up());
-
 
         }
     }

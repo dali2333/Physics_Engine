@@ -9,12 +9,12 @@ namespace GameEngine
 {
     static class KeyBoard
     {
-        public static string Pressed_Key; //按下的键值
-        public static int KeyBoard_Delay = 10; //按键延迟
+        public static int KeyBoard_Delay = 1; //按键延迟
+        private static bool Is_Open = true;//是否启动
 
-        private static bool Is_Open = true;
-        private static bool Is_Control_Obj = false; //键盘是否绑定控制对象
+        public static bool Is_Control_Obj = false; //键盘是否绑定控制对象
         public static GameOBJ Controlling_Obj; //控制中的对象
+
         public static bool Control_Obj(string name) //绑定对象
         {
             if (Window.All_Obj.ContainsKey(name))
@@ -34,84 +34,21 @@ namespace GameEngine
             Is_Control_Obj = false;
         }
 
-        public static void Stop() //停止运行
+        public delegate void KeyDowm_Events(string key);//按键事件
+        public static event KeyDowm_Events KeyDowm;
+
+        public static void Close() //停止运行
         {
             Is_Open = false;
-        }
-
-        private static void Key_Down()
-        {
-            ///////////////////////////////////
-
-            if (Is_Control_Obj)
-            {
-                switch (Pressed_Key)
-                {
-                    case "0": break;
-
-                    case "UpArrow":
-                        //Controlling_Obj.Speed_Y += -5;
-                        Controlling_Obj.Move(0,-1); 
-                        break;
-                    case "DownArrow":
-                        Controlling_Obj.Move(0, 1);
-                        break;
-                    case "LeftArrow":
-                        Controlling_Obj.Move(-1, 0);
-                        break;
-                    case "RightArrow":
-                        Controlling_Obj.Move(1, 0);
-                        break;
-
-                    case "S":
-                        Physics.Restart_Physics();
-                        break;
-                    case "D":
-                        Physics.Stop_Physics();
-                        break;
-                    case "F":
-                        Graph.Enable_Animation = true;
-                        break;
-                    case "G":
-                        Graph.Enable_Animation = false;
-                        break;
-                    case "A":
-                        Physics.Restart_Game_Time();
-                        break;
-                    case "Escape":
-
-                        if (Window.If_Show_Prerendered_Frame)
-                        {
-                            Window.Stop_Prerendered();
-                            Stop();
-                        }
-                        break;
-
-                    default: break;
-                }
-            }
-            else
-            {
-                switch (Pressed_Key)
-                {
-                    case "0": break;
-
-                    default: break;
-                }
-            }
-
-            ///////////////////////////////////
-            
         }
 
         private static void Main_Loop() //主循环
         {
             while (Is_Open)
             {
-                Pressed_Key = Console.ReadKey(true).Key.ToString();
-
-                Key_Down();
-
+                //if (Console.KeyAvailable)
+                KeyDowm.Invoke(Console.ReadKey(true).Key.ToString());
+                
                 Thread.Sleep(KeyBoard_Delay);
             }
         }

@@ -271,9 +271,18 @@ namespace GameEngine
 
         }
 
+        private static bool Window_Open = true;//是否启用
+        public static void Close() //关闭线程
+        {
+            Window_Open = false;
+
+            Window_Buffer.Clear();
+
+            Frame_Watch.Reset();
+        }
         private static void Main_Loop() //主循环
         {
-            while (true)
+            while (Window_Open)
             {
                 Frame_Watch.Restart();
 
@@ -326,6 +335,9 @@ namespace GameEngine
 
         public static void Start_Up()
         {
+            //
+            Window_Open = true;
+
             //主循环
             Main_Loop();
         }

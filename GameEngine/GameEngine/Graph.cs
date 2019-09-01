@@ -102,7 +102,15 @@ namespace GameEngine
 
         private static readonly Stopwatch Animation_Watch = new Stopwatch(); //帧率计时器
         private static readonly int Animation__Interval_Time = 500; //动画输出间隔ms(不保证准确输出间隔)
-        public static bool Enable_Animation = false; //启动动画
+        private static bool Enable_Animation = false; //动画是否启动
+        public static void Start_Animation() //启动动画
+        {
+            Enable_Animation = true;
+        }
+        public static void Close_Animation() //关闭动画
+        {
+            Enable_Animation = false;
+        }
 
         public static void Animation_Out() //逐帧输出动画(非同步变化)
         {
@@ -213,7 +221,7 @@ namespace GameEngine
         }
 
         //文件操作
-        public static string Graph_Path; //进行操作的位置
+        private static string Graph_Path; //进行操作的位置
         public static Dictionary<string, char[,]> ReadFile(string filename) //读取图片文件
         {
             using (System.IO.StreamReader file = new System.IO.StreamReader(Graph_Path + filename))
@@ -310,7 +318,6 @@ namespace GameEngine
         public static void Loading(string path="") //输入path后每次调用都以该目录为基准，不然每次用全局路径也行
         {
             Graph_Path = path;
-            Enable_Animation = false;
         }
 
         public static void Add_File_To_Graphs(string name) //将文件中的图片添加到缓存中

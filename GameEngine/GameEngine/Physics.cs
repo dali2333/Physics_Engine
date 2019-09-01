@@ -24,10 +24,10 @@ namespace GameEngine
 
         private static readonly Stopwatch Game_Time_Watch = new Stopwatch();//游戏时间计时器
         private static readonly Stopwatch Physics_Time_Watch = new Stopwatch(); //演算时长计时器
-        private static readonly Timer Physics_Timer = new Timer(Equal_Interval_Callback, null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan); //演算定时器
+        private static Timer Physics_Timer; //演算定时器
 
         private static readonly List<long> Alarm_Contents = new List<long>();//闹钟触发时间
-        public static bool Alarm_Open = true; //是否开启闹钟
+        private static bool Alarm_Open = true; //是否开启闹钟
 
         //应用方法
         public static bool Made_Obj(string name, int x,int y,int sx,int sy,char[,]look) //创建物体
@@ -131,6 +131,10 @@ namespace GameEngine
         {
             Alarm_Contents.Clear();
         }
+        public static void Close_Alarm() //关闭闹钟
+        {
+            Alarm_Open = false;
+        }
 
         //物理事件
         public delegate void OBJTouch_Events(GameOBJ rc1, GameOBJ rc2o);//碰撞
@@ -141,7 +145,7 @@ namespace GameEngine
         public static event Alarm_Events Alarm_Clock;
 
         //物理演算部分
-        public static bool Judge_Touched(GameOBJ rc1, GameOBJ rc2) //判断是否碰撞
+        private static bool Judge_Touched(GameOBJ rc1, GameOBJ rc2) //判断是否碰撞
         {
             if (rc1.X + rc1.SX > rc2.X &&
                 rc2.X + rc2.SX > rc1.X &&
@@ -155,7 +159,7 @@ namespace GameEngine
                 return false;
             }
         }
-        public static void Overlap_Friction(GameOBJ rc1, GameOBJ rc2) //碰撞-摩擦效果
+        private static void Overlap_Friction(GameOBJ rc1, GameOBJ rc2) //碰撞-摩擦效果
         {
             if (rc1.X + rc1.SX > rc2.X &&
                 rc2.X + rc2.SX > rc1.X &&
@@ -233,7 +237,7 @@ namespace GameEngine
                     }
                 }
 
-                Touched(rc1,rc2);
+                Touched.Invoke(rc1,rc2);
             }
 
         }
@@ -274,7 +278,7 @@ namespace GameEngine
                     //obj.Judge_Visible();
                     if (obj.X + obj.SX >= Window.Size_X - 1 || obj.X < 0 || obj.Y + obj.SY >= Window.Size_Y || obj.Y < 0)
                     {
-                        Out_Of_Bounds(obj);
+                        Out_Of_Bounds.Invoke(obj);
 
                         obj.Visible = false;
 
@@ -294,7 +298,7 @@ namespace GameEngine
             });
 
             //信息显示
-            //Graph.Add_String(Graph.All_Graphs["V"], "        ");Graph.Add_String(Graph.All_Graphs["V"], Physics_Time_Watch.ElapsedMilliseconds.ToString()+" "+ Game_Time_Watch.ElapsedMilliseconds.ToString());
+            Graph.Add_String(Graph.All_Graphs["V"], "        ");Graph.Add_String(Graph.All_Graphs["V"], Physics_Time_Watch.ElapsedMilliseconds.ToString()+" "+ Game_Time_Watch.ElapsedMilliseconds.ToString());
             
             //动态延迟时间
             Physics_Interval_Time = (float)Physics_Time_Watch.ElapsedMilliseconds / 1000;
@@ -315,7 +319,7 @@ namespace GameEngine
                 {
                     if (Game_Time_Now >= t)
                     {
-                        Alarm_Clock(t, Game_Time_Now);
+                        Alarm_Clock.Invoke(t, Game_Time_Now);
 
                         outs.Add(t);
                     }
@@ -335,9 +339,19 @@ namespace GameEngine
             
         }
 
+        private static bool Physics_Open = true;//是否启用
+        public static void Close() //关闭线程
+        {
+            Physics_Open = false;
+
+            Game_Time_Watch.Reset();
+            Physics_Time_Watch.Reset();
+
+            Physics_Timer.Dispose();
+        }
         private static void Main_Loop() //主循环 用作特殊效果
         {
-            while (true)
+            while (Physics_Open)
             {
                 Alarm_On();//闹钟响应
 
@@ -346,9 +360,12 @@ namespace GameEngine
                 Thread.Sleep(Main_Loop_Sleep);
             }
         }
+
+        
         public static void Start_Up()
         {
             //启动准备
+            Physics_Timer = new Timer(Equal_Interval_Callback, null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
             Physics_Timer.Change(TimeSpan.Zero, TimeSpan.FromSeconds(Timer_Interval_Time));
             Is_Running = true;
             Game_Time_Watch.Start();
