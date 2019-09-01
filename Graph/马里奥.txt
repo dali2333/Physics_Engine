@@ -1,0 +1,21 @@
+-----
+Stand 16 10
+                
+   ,@@O@O@OOOOO.
+   ]`=OO@@^OO`  
+  *OO[\@@@@OO@@@
+  ,[\@@@@@O/]o` 
+    ,OO/O[/`..  
+  /,\o@\oOOO]o].
+=OO^/O@@OO@OOo/O
+=@@@@@OO@OO@O@@@
+ [[O@@@O[\O@@O[[
+  .o\^     .o[`.
+-----
+StandSmall 8 6
+  ,]]`  
+ =]O@O\`
+ .\@@OO.
+ ,oOOO]`
+O@@@@@O@
+ =^  ./.

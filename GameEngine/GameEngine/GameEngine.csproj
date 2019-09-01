@@ -52,6 +52,7 @@
     <Compile Include="GameOBJ.cs" />
     <Compile Include="Graph.cs" />
     <Compile Include="KeyBoard.cs" />
+    <Compile Include="Music.cs" />
     <Compile Include="Physics.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

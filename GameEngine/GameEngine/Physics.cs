@@ -171,7 +171,7 @@ namespace GameEngine
                     if (rc2.Y - rc1.Y+rc1.SY/2 > 0)
                     {
                         //弹力
-                        rc1.Speed_Y = -rc1.Elastic * rc1.Speed_Y;//rc2.Weight / rc1.Weight * (Math.Abs(rc1.Speed_Y) + Math.Abs(rc2.Speed_Y));
+                        rc1.Speed_Y = -(rc1.Elastic + rc2.Elastic) * rc1.Speed_Y;//rc2.Weight / rc1.Weight * (Math.Abs(rc1.Speed_Y) + Math.Abs(rc2.Speed_Y));
                     }
                 }
                 else if (rc1.Speed_Y < 0)
@@ -179,7 +179,7 @@ namespace GameEngine
                     if (rc2.Y+rc2.SY - rc1.Y-rc1.SY/2 < 0)
                     {
                         //弹力
-                        rc1.Speed_Y = -rc1.Elastic * rc1.Speed_Y;//rc2.Weight / rc1.Weight * (Math.Abs(rc1.Speed_Y) + Math.Abs(rc2.Speed_Y));
+                        rc1.Speed_Y = -(rc1.Elastic + rc2.Elastic) * rc1.Speed_Y;//rc2.Weight / rc1.Weight * (Math.Abs(rc1.Speed_Y) + Math.Abs(rc2.Speed_Y));
                     }
                 }
                 else
@@ -207,14 +207,14 @@ namespace GameEngine
                 {
                     if (rc2.X - rc1.X + rc1.SX / 2 > 0)
                     {
-                        rc1.Speed_X = -rc1.Elastic * rc1.Speed_X;//rc2.Weight / rc1.Weight * (Math.Abs(rc1.Speed_Y) + Math.Abs(rc2.Speed_Y));
+                        rc1.Speed_X = -(rc1.Elastic + rc2.Elastic) * rc1.Speed_X;//rc2.Weight / rc1.Weight * (Math.Abs(rc1.Speed_Y) + Math.Abs(rc2.Speed_Y));
                     }
                 }
                 else if (rc1.Speed_X < 0)
                 {
                     if (rc2.X + rc2.SX - rc1.X - rc1.SX / 2 < 0)
                     {
-                        rc1.Speed_X = -rc1.Elastic * rc1.Speed_X;//rc2.Weight / rc1.Weight * (Math.Abs(rc1.Speed_Y) + Math.Abs(rc2.Speed_Y));
+                        rc1.Speed_X = -(rc1.Elastic + rc2.Elastic) * rc1.Speed_X;//rc2.Weight / rc1.Weight * (Math.Abs(rc1.Speed_Y) + Math.Abs(rc2.Speed_Y));
 
                     }
                 }
@@ -298,7 +298,7 @@ namespace GameEngine
             });
 
             //信息显示
-            Graph.Add_String(Graph.All_Graphs["V"], "        ");Graph.Add_String(Graph.All_Graphs["V"], Physics_Time_Watch.ElapsedMilliseconds.ToString()+" "+ Game_Time_Watch.ElapsedMilliseconds.ToString());
+            //Graph.Add_String(Graph.All_Graphs["WORD"], "        ");Graph.Add_String(Graph.All_Graphs["WORD"], Physics_Time_Watch.ElapsedMilliseconds.ToString()+" "+ Game_Time_Watch.ElapsedMilliseconds.ToString());
             
             //动态延迟时间
             Physics_Interval_Time = (float)Physics_Time_Watch.ElapsedMilliseconds / 1000;

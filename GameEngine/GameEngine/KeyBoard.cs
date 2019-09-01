@@ -9,7 +9,7 @@ namespace GameEngine
 {
     static class KeyBoard
     {
-        public static int KeyBoard_Delay = 1; //按键延迟
+        public static int KeyBoard_Delay = 50; //按键延迟
         private static bool Is_Open = true;//是否启动
 
         public static bool Is_Control_Obj = false; //键盘是否绑定控制对象
