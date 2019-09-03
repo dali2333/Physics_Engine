@@ -65,16 +65,39 @@ namespace GameEngine
         public static int Size_Y;
 
         private static StringBuilder Window_Buffer; //屏幕输出缓存
-        private static char[,] Window_Buffer_0; //原始缓冲区
-        private static char[,] Window_Buffer_1; //原始缓冲区
+        private static char[,] Window_Buffer_0; //原始缓冲区0
+        private static char[,] Window_Buffer_1; //原始缓冲区1
         private static bool Switch_Buffer = true; //双重缓存切换
 
         private static readonly Stopwatch Frame_Watch = new Stopwatch(); //帧率计时器
         public static readonly long Refresh_Dely = 30; //每帧输出时间ms fps = 1000/Refresh_Dely
 
-        public static char[,] BackGround; //背景画面
-        
+        public static char[,] BackGround; //背景画面 默认都是 '\0'
+        public static void Change_BackGround(char[,] b) //修改背景(尺寸不同与背景则贴合左上角,超出窗口自动去除)
+        {
+            if(b.GetLength(0)== Size_X && b.GetLength(1) == Size_Y)
+            {
+                BackGround = b;
+            }
+            else
+            {
+                BackGround = Graph.Add_Graph(new Tuple<int, int>(Size_X, Size_Y), new Tuple<int, int, char[,]>(0, 0, b));
+            }
+            
+        }
+        public static void Add_To_BackGround(char[,] b,int x=0,int y=0) //将图片绘制到背景上 x,y是图片左上角位置
+        {
+            Graph.Mix_Graph(BackGround, b, x, y);
+        }
+        public static void Clean_BackGround() //清空背景内容 '\0'
+        {
+            BackGround = new char[Size_X, Size_Y];
+        }
+
+
         public static Dictionary<string,GameOBJ> All_Obj = new Dictionary<string, GameOBJ>(10); //所有物体
+        public static Dictionary<string, SpliceOBJ> All_SpliceOBJ = new Dictionary<string, SpliceOBJ>(10); //所有组合体
+
         public static bool Add_Obj(string name,GameOBJ obj)
         {
             try
@@ -101,8 +124,36 @@ namespace GameEngine
                 return false;
             }
         }
+        public static bool Add_SpliceObj(string name, SpliceOBJ obj)
+        {
+            try
+            {
+                obj.Name = name;
+                obj.Judge_Visible();
+                All_SpliceOBJ.Add(name, obj);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        public static bool Remove_SpliceObj(string name)
+        {
+            try
+            {
+                All_SpliceOBJ.Remove(name);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
 
-        public static bool If_Show_Prerendered_Frame = true; //是否输出预渲染
+
+
+        public static bool If_Show_Prerendered_Frame = false; //是否输出预渲染
         public static void Stop_Prerendered() //强行打断预渲染
         {
             If_Show_Prerendered_Frame = false;
@@ -318,7 +369,7 @@ namespace GameEngine
                 {
                     Window_Buffer_0[i, j] = ' ';
                     Window_Buffer_1[i, j] = ' ';
-                    BackGround[i, j] = ' ';
+                    //BackGround[i, j] = ' ';
                 }
             }
 

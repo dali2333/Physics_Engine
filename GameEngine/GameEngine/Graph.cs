@@ -177,6 +177,95 @@ namespace GameEngine
             }
 
         }
+        public static char[,] String_To_Graph(string s) //字符串转图片 一行高
+        {
+            char[,] OutP = new char[s.Length, 1];
+
+            for (int i = 0; i < s.Length; i++)
+            {
+                OutP[i, 0] = s[i];
+            }
+
+            return OutP;
+        }
+        public static char[,] String_To_Graph(string s, int x, int y) //字符串转图片 指定大小自动折行
+        {
+            char[,] OutP = new char[x, y];
+            int yy = 0; int xx = 0;
+
+            for (int i = 0; i < s.Length; i++)
+            {
+                if (yy < y)
+                {
+                    if (xx < x)
+                    {
+                        OutP[xx++, yy] = s[i];
+                    }
+                    else
+                    {
+                        xx = 0;
+                        yy++;
+                    }
+                }
+                
+            }
+
+            return OutP;
+        }
+        public static char[,] Add_Graph(Tuple<int, int> size, params Tuple<int, int, char[,]>[] p) //图片添加到一起导出(图片位置一一对应) size为目标输出尺寸 先添加的在下
+        {
+            char[,] OutP = new char[size.Item1, size.Item2];
+            
+            foreach (Tuple<int, int, char[,]> t in p)
+            {
+                for (int i = 0; i < t.Item3.GetLength(1); i++)
+                {
+                    for (int j = 0; j < t.Item3.GetLength(0); j++)
+                    {
+                        if (t.Item1 + i < OutP.GetLength(0) && t.Item2 + j < OutP.GetLength(1))
+                        {
+                            if (t.Item3[i, j] != '\0')
+                            {
+                                OutP[t.Item1 + i, t.Item2 + j] = t.Item3[i, j];
+                            }
+                        }
+                    }
+                }
+
+            }
+
+            return OutP;
+        }
+        public static char[,] Add_Graph(params Tuple<int, int, char[,]>[] p) //图片添加到一起导出(图片位置一一对应) 不指定size自动导出最大矩形
+        {
+            int[] xx = new int[p.Length];
+            int[] yy = new int[p.Length];
+            for(int i=0;i<p.Length;i++)
+            {
+                xx[i] = p[i].Item1 + p[i].Item3.GetLength(0);
+                yy[i] = p[i].Item2 + p[i].Item3.GetLength(1);
+            }
+
+            char[,] OutP = new char[xx.Max(), yy.Max()];
+
+            foreach (Tuple<int, int, char[,]> t in p)
+            {
+                for (int i = 0; i < t.Item3.GetLength(1); i++)
+                {
+                    for (int j = 0; j < t.Item3.GetLength(0); j++)
+                    {
+                        if (t.Item3[i, j] != '\0')
+                        {
+                            OutP[t.Item1 + i, t.Item2 + j] = t.Item3[i, j];
+                        }
+                    }
+                }
+
+            }
+
+            return OutP;
+        }
+        
         public static void Mix_Graph(char[,] look, char[,] g, int x = 0, int y = 0) //将图片叠加
         {
             if (y < look.GetLength(1))
@@ -185,9 +274,12 @@ namespace GameEngine
                 {
                     for (int j = 0; j < g.GetLength(1); j++)
                     {
-                        if (x + i < look.GetLength(0))
+                        if (x + i < look.GetLength(0) && y + j < look.GetLength(1))
                         {
-                            look[x + i, y + j] = g[i, j];
+                            if (g[i, j] != '\0')
+                            {
+                                look[x + i, y + j] = g[i, j];
+                            }
                         }
 
                     }
@@ -201,8 +293,10 @@ namespace GameEngine
             {
                 for (int j = 0; j < g.GetLength(1); j++)
                 {
-                    look[x + i, y + j] = g[i, j];
-
+                    if (g[i, j] != '\0')
+                    {
+                        look[x + i, y + j] = g[i, j];
+                    }
                 }
             }
             
@@ -213,12 +307,29 @@ namespace GameEngine
             {
                 for (int j = 0; j < g.GetLength(1); j++)
                 {
-                    look[i, j] = g[i, j];
-
+                    if (g[i, j] != '\0')
+                    {
+                        look[i, j] = g[i, j];
+                    }
                 }
             }
 
         }
+        public static void Replace_Pixel(char[,] b,char Initial_p,char Aims_p) //将b中的Initial_p替换成Aims_p
+        {
+            Parallel.For(0, b.GetLength(1), (i) =>
+            {
+                for (int j = 0; j < b.GetLength(0); j++)
+                {
+                    if (b[j, i] == Initial_p)
+                    {
+                        b[j, i] = Aims_p;
+                    }
+                }
+            });
+
+        }
+
 
         //文件操作
         private static string Graph_Path; //进行操作的位置

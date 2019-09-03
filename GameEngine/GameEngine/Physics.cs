@@ -30,42 +30,6 @@ namespace GameEngine
         private static bool Alarm_Open = true; //是否开启闹钟
 
         //应用方法
-        public static bool Made_Obj(string name, int x,int y,int sx,int sy,char[,]look) //创建物体
-        {
-            if (sx <= 0 || sy <= 0)
-            {
-                return false;
-            }
-            else
-            {
-                if (Window.Add_Obj(name, new GameOBJ(x, y, sx, sy, look)))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-        }
-        public static bool Change_Obj_Physics(string name, float weight = 1, float vx = 0, float vy = 0, float fx = 0, float fy = 0,float elastic=1, float friction = 0) //物体物理性质
-        {
-            if (weight <= 0 || !Window.All_Obj.ContainsKey(name))
-            {
-                return false;
-            }
-            else
-            {
-                Window.All_Obj[name].Add_Physics(weight,vx,vy,fx,fy, elastic, friction);
-
-                return true;
-            }
-        }
-        public static void Change_Obj_Physics_S(string name,bool Movable=true,bool Collisible=true)
-        {
-            Window.All_Obj[name].Movable = Movable;
-            Window.All_Obj[name].Collisible = Collisible;
-        }
         public static void Stop_Physics() //暂停物理演算(暂停时钟)
         {
             if (Is_Running)
@@ -159,150 +123,199 @@ namespace GameEngine
                 return false;
             }
         }
-        private static void Overlap_Friction(GameOBJ rc1, GameOBJ rc2) //碰撞-摩擦效果
+        private static void Overlap_Friction(GameOBJ rc1) //碰撞-摩擦效果
         {
-            if (rc1.X + rc1.SX > rc2.X &&
-                rc2.X + rc2.SX > rc1.X &&
-                rc1.Y + rc1.SY > rc2.Y &&
-                rc2.Y + rc2.SY > rc1.Y)
+            //遍历其余物体
+            Parallel.ForEach(Window.All_Obj.Values, (rc2) =>
             {
-                if (rc1.Speed_Y > 0)
+                //找出符合标准的物体
+                if (rc2.Collisible && rc1.Name != rc2.Name)
                 {
-                    if (rc2.Y - rc1.Y+rc1.SY/2 > 0)
+                    //判断是否碰撞
+                    if (rc1.X + rc1.SX > rc2.X &&
+                    rc2.X + rc2.SX > rc1.X &&
+                    rc1.Y + rc1.SY > rc2.Y &&
+                    rc2.Y + rc2.SY > rc1.Y)
                     {
-                        //弹力
-                        rc1.Speed_Y = -(rc1.Elastic + rc2.Elastic) * rc1.Speed_Y;//rc2.Weight / rc1.Weight * (Math.Abs(rc1.Speed_Y) + Math.Abs(rc2.Speed_Y));
+                        //计算碰撞后反应
+                        if (rc1.Speed_Y > 0)
+                        {
+                            if (rc2.Y - rc1.Y + rc1.SY / 2 > 0)
+                            {
+                                //弹力
+                                rc1.Speed_Y = -(rc1.Elastic + rc2.Elastic) * rc1.Speed_Y;//rc2.Weight / rc1.Weight * (Math.Abs(rc1.Speed_Y) + Math.Abs(rc2.Speed_Y));
+                            }
+                        }
+                        else if (rc1.Speed_Y < 0)
+                        {
+                            if (rc2.Y + rc2.SY - rc1.Y - rc1.SY / 2 < 0)
+                            {
+                                //弹力
+                                rc1.Speed_Y = -(rc1.Elastic + rc2.Elastic) * rc1.Speed_Y;//rc2.Weight / rc1.Weight * (Math.Abs(rc1.Speed_Y) + Math.Abs(rc2.Speed_Y));
+                            }
+                        }
+                        else
+                        {
+                            //支持力
+                            /*
+                            if(rc2.Y - rc1.Y + rc1.SY / 2 > 0 || rc2.Y + rc2.SY - rc1.Y - rc1.SY / 2 < 0)
+                            {
+                                //rc2.F_Y = -rc2.Weight * Global_GY;
+
+                                //rc2.Speed_Y += -rc2.Weight * Global_GY * Physics_Interval_Time;
+
+                                //Console.Write('A');
+                            }
+                            */
+
+                            //摩擦力
+                            if (rc2.Speed_X != 0)
+                            {
+                                rc2.Speed_X += -rc2.Friction * Math.Abs(Global_GY) * rc2.Weight * rc2.Speed_X / Math.Abs(rc2.Speed_X) * Physics_Interval_Time;
+                            }
+                        }
+
+                        if (rc1.Speed_X > 0)
+                        {
+                            if (rc2.X - rc1.X + rc1.SX / 2 > 0)
+                            {
+                                rc1.Speed_X = -(rc1.Elastic + rc2.Elastic) * rc1.Speed_X;//rc2.Weight / rc1.Weight * (Math.Abs(rc1.Speed_Y) + Math.Abs(rc2.Speed_Y));
+                            }
+                        }
+                        else if (rc1.Speed_X < 0)
+                        {
+                            if (rc2.X + rc2.SX - rc1.X - rc1.SX / 2 < 0)
+                            {
+                                rc1.Speed_X = -(rc1.Elastic + rc2.Elastic) * rc1.Speed_X;//rc2.Weight / rc1.Weight * (Math.Abs(rc1.Speed_Y) + Math.Abs(rc2.Speed_Y));
+
+                            }
+                        }
+                        else
+                        {
+                            //支持力
+                            /*
+                            if (rc2.X - rc1.X + rc1.SX / 2 > 0 || rc2.X + rc2.SX - rc1.X - rc1.SX / 2 < 0)
+                            {
+                                //rc1.F_X = -rc1.Weight * Global_GX;
+                                //rc2.Speed_X += -rc2.Weight * Global_GY * Physics_Interval_Time;
+                                //Console.Write('A');
+                            }
+                            */
+
+                            //摩擦力
+                            if (rc2.Speed_Y != 0)
+                            {
+                                rc2.Speed_Y += -rc2.Friction * Math.Abs(Global_GX) * rc2.Weight * rc2.Speed_Y / Math.Abs(rc2.Speed_Y) * Physics_Interval_Time;
+                            }
+                        }
+
+                        //输出碰撞事件
+                        Touched.Invoke(rc1, rc2);
+
                     }
                 }
-                else if (rc1.Speed_Y < 0)
-                {
-                    if (rc2.Y+rc2.SY - rc1.Y-rc1.SY/2 < 0)
-                    {
-                        //弹力
-                        rc1.Speed_Y = -(rc1.Elastic + rc2.Elastic) * rc1.Speed_Y;//rc2.Weight / rc1.Weight * (Math.Abs(rc1.Speed_Y) + Math.Abs(rc2.Speed_Y));
-                    }
-                }
-                else
-                {
-                    //支持力
-                    /*
-                    if(rc2.Y - rc1.Y + rc1.SY / 2 > 0 || rc2.Y + rc2.SY - rc1.Y - rc1.SY / 2 < 0)
-                    {
-                        //rc2.F_Y = -rc2.Weight * Global_GY;
-
-                        //rc2.Speed_Y += -rc2.Weight * Global_GY * Physics_Interval_Time;
-
-                        //Console.Write('A');
-                    }
-                    */
-                    
-                    //摩擦力
-                    if (rc2.Speed_X != 0)
-                    {
-                        rc2.Speed_X += -rc2.Friction * Math.Abs(Global_GY) * rc2.Weight * rc2.Speed_X / Math.Abs(rc2.Speed_X) * Physics_Interval_Time;
-                    }
-                }
-
-                if (rc1.Speed_X > 0)
-                {
-                    if (rc2.X - rc1.X + rc1.SX / 2 > 0)
-                    {
-                        rc1.Speed_X = -(rc1.Elastic + rc2.Elastic) * rc1.Speed_X;//rc2.Weight / rc1.Weight * (Math.Abs(rc1.Speed_Y) + Math.Abs(rc2.Speed_Y));
-                    }
-                }
-                else if (rc1.Speed_X < 0)
-                {
-                    if (rc2.X + rc2.SX - rc1.X - rc1.SX / 2 < 0)
-                    {
-                        rc1.Speed_X = -(rc1.Elastic + rc2.Elastic) * rc1.Speed_X;//rc2.Weight / rc1.Weight * (Math.Abs(rc1.Speed_Y) + Math.Abs(rc2.Speed_Y));
-
-                    }
-                }
-                else
-                {
-                    //支持力
-                    /*
-                    if (rc2.X - rc1.X + rc1.SX / 2 > 0 || rc2.X + rc2.SX - rc1.X - rc1.SX / 2 < 0)
-                    {
-                        //rc1.F_X = -rc1.Weight * Global_GX;
-                        //rc2.Speed_X += -rc2.Weight * Global_GY * Physics_Interval_Time;
-                        //Console.Write('A');
-                    }
-                    */
-
-                    //摩擦力
-                    if (rc2.Speed_Y != 0)
-                    {
-                        rc2.Speed_Y += -rc2.Friction * Math.Abs(Global_GX) * rc2.Weight * rc2.Speed_Y / Math.Abs(rc2.Speed_Y) * Physics_Interval_Time;
-                    }
-                }
-
-                Touched.Invoke(rc1,rc2);
-            }
+            });
 
         }
+
         private static void Equal_Interval_Callback(object state) //等时间间隔计算
         {
             //物理算法
             Parallel.ForEach(Window.All_Obj.Values, (obj) =>
             {
-
-                if (obj.Collisible) //碰撞-摩擦计算
+                //组合体
+                if (obj.Is_Spliced) 
                 {
-                    Parallel.ForEach(Window.All_Obj.Values, (obj2) =>
+                    SpliceOBJ so = Window.All_SpliceOBJ[obj.Splice_Name];
+
+                    if (obj.Collisible)
                     {
-                        if (obj2.Collisible && obj.Name != obj2.Name)
-                        {
-                                ///////////////////////////////////
+                        ///////////////////////////////////
 
-                                Overlap_Friction(obj, obj2);
+                        
+                        
+                        ///////////////////////////////////
 
-                                ///////////////////////////////////
-                            }
-                    });
+                    }
 
-                }
-
-                if (obj.Movable) //位移-速度计算
-                {
-                    ///////////////////////////////////
-                    obj.X += obj.Speed_X * Physics_Interval_Time;
-                    obj.Y += obj.Speed_Y * Physics_Interval_Time;
-
-                    obj.Speed_X += (obj.F_X / obj.Weight + Global_GX) * Physics_Interval_Time;
-                    obj.Speed_Y += (obj.F_Y / obj.Weight + Global_GY) * Physics_Interval_Time;
-
-                    if (obj.Speed_X > Global_Max_Speed) { obj.Speed_X = Global_Max_Speed; }
-                    if (obj.Speed_Y > Global_Max_Speed) { obj.Speed_Y = Global_Max_Speed; }
-
-                    //obj.Judge_Visible();
-                    if (obj.X + obj.SX >= Window.Size_X - 1 || obj.X < 0 || obj.Y + obj.SY >= Window.Size_Y || obj.Y < 0)
+                    if (so.Movable) //位移-速度计算
                     {
-                        Out_Of_Bounds.Invoke(obj);
+                        ///////////////////////////////////
+                        so.Move(so.Speed_X * Physics_Interval_Time, so.Speed_Y * Physics_Interval_Time);
 
-                        obj.Visible = false;
+                        so.Speed_X += (so.F_X / so.Weight + Global_GX) * Physics_Interval_Time;
+                        so.Speed_Y += (so.F_Y / so.Weight + Global_GY) * Physics_Interval_Time;
 
+                        if (so.Speed_X > Global_Max_Speed) { so.Speed_X = Global_Max_Speed; }
+                        if (so.Speed_Y > Global_Max_Speed) { so.Speed_Y = Global_Max_Speed; }
+
+                        so.Judge_Visible();
+                        so.Judge_Speed();
+
+                        ///////////////////////////////////
                     }
                     else
                     {
-                        obj.Visible = true;
+                        so.Speed_X = 0; so.Speed_Y = 0;
                     }
 
-                    ///////////////////////////////////
                 }
+                //非组合体
                 else
                 {
-                    obj.Speed_X = 0; obj.Speed_Y = 0;
+                    //碰撞-摩擦计算
+                    if (obj.Collisible)
+                    {
+                        ///////////////////////////////////
+
+                        Overlap_Friction(obj); //可更换模块
+
+                        ///////////////////////////////////
+
+                    }
+                    //位移-速度计算
+                    if (obj.Movable) 
+                    {
+                        ///////////////////////////////////
+                        obj.X += obj.Speed_X * Physics_Interval_Time;
+                        obj.Y += obj.Speed_Y * Physics_Interval_Time;
+
+                        obj.Speed_X += (obj.F_X / obj.Weight + Global_GX) * Physics_Interval_Time;
+                        obj.Speed_Y += (obj.F_Y / obj.Weight + Global_GY) * Physics_Interval_Time;
+
+                        
+                        obj.Judge_Speed();
+                        //obj.Judge_Visible();
+
+                        if (obj.X + obj.SX >= Window.Size_X - 1 || obj.X < 0 || obj.Y + obj.SY >= Window.Size_Y || obj.Y < 0)
+                        {
+                            Out_Of_Bounds.Invoke(obj);
+
+                            obj.Visible = false;
+
+                        }
+                        else
+                        {
+                            obj.Visible = true;
+                        }
+
+                        ///////////////////////////////////
+                    }
+                    else
+                    {
+                        obj.Speed_X = 0; obj.Speed_Y = 0;
+                    }
+
                 }
 
             });
 
             //信息显示
-            //Graph.Add_String(Graph.All_Graphs["WORD"], "        ");Graph.Add_String(Graph.All_Graphs["WORD"], Physics_Time_Watch.ElapsedMilliseconds.ToString()+" "+ Game_Time_Watch.ElapsedMilliseconds.ToString());
-            
+            Graph.Add_String(Graph.All_Graphs["V"], "        "); Graph.Add_String(Graph.All_Graphs["V"], Physics_Time_Watch.ElapsedMilliseconds.ToString() + " " + Game_Time_Watch.ElapsedMilliseconds.ToString());
+
             //动态延迟时间
             Physics_Interval_Time = (float)Physics_Time_Watch.ElapsedMilliseconds / 1000;
-            
+
             Physics_Time_Watch.Restart();
         }
 
