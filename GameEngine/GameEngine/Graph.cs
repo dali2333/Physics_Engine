@@ -78,9 +78,9 @@ namespace GameEngine
         public static Dictionary<string, char[,]> All_Graphs = new Dictionary<string, char[,]>();
         //所有存储的动画
         public static Dictionary<string, Animation> All_Animations = new Dictionary<string, Animation>();
-        //动画绑定物体
-        private static readonly List<string[]> Binding_Obj = new List<string[]>();
-
+        
+        //动画绑定
+        private static readonly List<string[]> Binding_Obj = new List<string[]>();//绑定动画的物体
         public static void Load_Animation(string name,string path) //创建并添加动画
         {
             All_Animations[name] = new Animation(name,path);
@@ -99,7 +99,7 @@ namespace GameEngine
 
         }
 
-
+        //动画运行
         private static readonly Stopwatch Animation_Watch = new Stopwatch(); //帧率计时器
         private static readonly int Animation__Interval_Time = 500; //动画输出间隔ms(不保证准确输出间隔)
         private static bool Enable_Animation = false; //动画是否启动
@@ -111,7 +111,6 @@ namespace GameEngine
         {
             Enable_Animation = false;
         }
-
         public static void Animation_Out() //逐帧输出动画(非同步变化)
         {
             if (Enable_Animation) 
@@ -265,7 +264,6 @@ namespace GameEngine
 
             return OutP;
         }
-        
         public static void Mix_Graph(char[,] look, char[,] g, int x = 0, int y = 0) //将图片叠加
         {
             if (y < look.GetLength(1))
@@ -329,8 +327,7 @@ namespace GameEngine
             });
 
         }
-
-
+        
         //文件操作
         private static string Graph_Path; //进行操作的位置
         public static Dictionary<string, char[,]> ReadFile(string filename) //读取图片文件
@@ -430,7 +427,6 @@ namespace GameEngine
         {
             Graph_Path = path;
         }
-
         public static void Add_File_To_Graphs(string name) //将文件中的图片添加到缓存中
         {
             ReadFile(name).ToList().ForEach(x => All_Graphs.Add(x.Key, x.Value));

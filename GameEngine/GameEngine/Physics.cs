@@ -72,7 +72,6 @@ namespace GameEngine
             }
             
         }
-
         public static void Add_Alarm(long t) //添加闹钟
         {
             if (!Alarm_Contents.Contains(t))
@@ -107,8 +106,41 @@ namespace GameEngine
         public static event OBJOut_Events Out_Of_Bounds;
         public delegate void Alarm_Events(long t, long rt);//闹钟触发
         public static event Alarm_Events Alarm_Clock;
+        
+        //闹钟
+        private static long Game_Time_Now = 0;
+        private static void Alarm_On() //闹钟检测 闹钟时间如果小于 Physics.Main_Loop_Sleep*2 可能会不触发
+        {
+            if (Alarm_Open)
+            {
+                Game_Time_Now = Game_Time_Watch.ElapsedMilliseconds;
 
-        //物理演算部分
+                List<long> outs = new List<long>();
+                foreach (long t in Alarm_Contents)
+                {
+                    if (Game_Time_Now >= t)
+                    {
+                        Alarm_Clock.Invoke(t, Game_Time_Now);
+
+                        outs.Add(t);
+                    }
+                    else
+                    {
+                        break;
+                    }
+
+                }
+
+                foreach (long o in outs)
+                {
+                    Alarm_Contents.Remove(o);
+                }
+
+            }
+
+        }
+
+        //物理输出
         private static bool Judge_Touched(GameOBJ rc1, GameOBJ rc2) //判断是否碰撞
         {
             if (rc1.X + rc1.SX > rc2.X &&
@@ -217,7 +249,6 @@ namespace GameEngine
             });
 
         }
-
         private static void Equal_Interval_Callback(object state) //等时间间隔计算
         {
             //物理算法
@@ -227,7 +258,7 @@ namespace GameEngine
                 if (obj.Is_Spliced) 
                 {
                     SpliceOBJ so = Window.All_SpliceOBJ[obj.Splice_Name];
-
+                    //碰撞-摩擦计算
                     if (obj.Collisible)
                     {
                         ///////////////////////////////////
@@ -237,7 +268,7 @@ namespace GameEngine
                         ///////////////////////////////////
 
                     }
-
+                    //位移-速度计算
                     if (so.Movable) //位移-速度计算
                     {
                         ///////////////////////////////////
@@ -318,40 +349,7 @@ namespace GameEngine
 
             Physics_Time_Watch.Restart();
         }
-
-        //总控
-        private static long Game_Time_Now = 0;
-        private static void Alarm_On() //闹钟检测 闹钟时间如果小于 Physics.Main_Loop_Sleep*2 可能会不触发
-        {
-            if (Alarm_Open)
-            {
-                Game_Time_Now = Game_Time_Watch.ElapsedMilliseconds;
-
-                List<long> outs = new List<long>();
-                foreach (long t in Alarm_Contents)
-                {
-                    if (Game_Time_Now >= t)
-                    {
-                        Alarm_Clock.Invoke(t, Game_Time_Now);
-
-                        outs.Add(t);
-                    }
-                    else
-                    {
-                        break;
-                    }
-
-                }
-
-                foreach (long o in outs)
-                {
-                    Alarm_Contents.Remove(o);
-                }
-
-            }
-            
-        }
-
+        
         private static bool Physics_Open = true;//是否启用
         public static void Close() //关闭线程
         {
@@ -373,8 +371,8 @@ namespace GameEngine
                 Thread.Sleep(Main_Loop_Sleep);
             }
         }
-
-        
+       
+        //开始
         public static void Start_Up()
         {
             //启动准备

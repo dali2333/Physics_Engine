@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace GameEngine
 {
-    public class GameOBJ
+    public class GameOBJ //基础游戏体
     {
         //位置尺寸
         public float X;//位置
@@ -110,9 +110,11 @@ namespace GameEngine
         }
 
         //静态创建方法
+        public readonly static int Max_Objs = 20;//最大游戏体数
+
         public static bool Made_Obj(string name, int x, int y, int sx, int sy, char[,] look) //创建物体
         {
-            if (sx <= 0 || sy <= 0)
+            if (sx <= 0 || sy <= 0 || Window.All_Obj.Count > Max_Objs)
             {
                 return false;
             }
@@ -151,7 +153,7 @@ namespace GameEngine
 
     public class SpliceOBJ //组合体
     {
-        public readonly static int Max_Splice = 10; //最大组合数
+        public readonly static int Max_Splice = 10; //最大组合内元素数
 
         private readonly List<GameOBJ> All_OBJ_In = new List<GameOBJ>(Max_Splice); //组合内的物体
 
@@ -354,12 +356,16 @@ namespace GameEngine
             {
                 foreach (string o in oBJs)
                 {
-                    All_OBJ_In.Add(Window.All_Obj[o]);
+                    if (!Window.All_Obj[o].Is_Spliced)
+                    {
+                        All_OBJ_In.Add(Window.All_Obj[o]);
 
-                    Window.All_Obj[o].Is_Spliced = true;
-                    Window.All_Obj[o].Splice_Name = name;
+                        Window.All_Obj[o].Is_Spliced = true;
+                        Window.All_Obj[o].Splice_Name = name;
 
-                    weight += Window.All_Obj[o].Weight;
+                        weight += Window.All_Obj[o].Weight;
+                    }
+                    
                 }
             }
             

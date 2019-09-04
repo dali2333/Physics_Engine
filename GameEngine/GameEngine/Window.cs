@@ -60,7 +60,7 @@ namespace GameEngine
         }
         #endregion
 
-        //控制台尺寸
+        //控制台
         public static int Size_X;
         public static int Size_Y;
 
@@ -72,6 +72,7 @@ namespace GameEngine
         private static readonly Stopwatch Frame_Watch = new Stopwatch(); //帧率计时器
         public static readonly long Refresh_Dely = 30; //每帧输出时间ms fps = 1000/Refresh_Dely
 
+        //背景
         public static char[,] BackGround; //背景画面 默认都是 '\0'
         public static void Change_BackGround(char[,] b) //修改背景(尺寸不同与背景则贴合左上角,超出窗口自动去除)
         {
@@ -94,10 +95,9 @@ namespace GameEngine
             BackGround = new char[Size_X, Size_Y];
         }
 
-
+        //游戏体
         public static Dictionary<string,GameOBJ> All_Obj = new Dictionary<string, GameOBJ>(10); //所有物体
         public static Dictionary<string, SpliceOBJ> All_SpliceOBJ = new Dictionary<string, SpliceOBJ>(10); //所有组合体
-
         public static bool Add_Obj(string name,GameOBJ obj)
         {
             try
@@ -151,8 +151,7 @@ namespace GameEngine
             }
         }
 
-
-
+        //预渲染
         public static bool If_Show_Prerendered_Frame = false; //是否输出预渲染
         public static void Stop_Prerendered() //强行打断预渲染
         {
@@ -245,6 +244,7 @@ namespace GameEngine
             Console.WriteLine("Output Completed!");
         }
 
+        //屏幕显示
         private static void Show_Buffer() //缓存输出到画面
         {
             Window_Buffer.Clear();
@@ -356,6 +356,7 @@ namespace GameEngine
             }
         }
 
+        //开始
         public static void Loading(int size_X,int size_Y)
         {
             Size_X = size_X; Size_Y = size_Y;
@@ -383,7 +384,6 @@ namespace GameEngine
             SetFront(); //设置窗体始终最前
 
         }
-
         public static void Start_Up()
         {
             //
