@@ -11,10 +11,29 @@ namespace GameEngine
     public class GameOBJ //基础游戏体
     {
         //位置尺寸
-        public float X;//位置
+        public float X;//左上角位置
         public float Y;
         public int SX;//尺寸
         public int SY;
+        public float NX;//下一帧左上角位置
+        public float NY;
+        public float PX//右下角位置
+        {
+            get { return X + SX; }
+        }
+        public float PY
+        {
+            get { return Y + SY; }
+        }
+        public float NPX//下一帧右下角位置
+        {
+            get { return NX + SX; }
+        }
+        public float NPY
+        {
+            get { return NY + SY; }
+        }
+
         //外观性质
         public bool Visible = true;//可见性
         public char[,] Look;//外观
@@ -60,8 +79,8 @@ namespace GameEngine
 
         public GameOBJ(int x, int y, int sx, int sy, char[,] look, bool visible = true)
         {
-            //MX = x;MY = y;
             X = x; Y = y; SX = sx; SY = sy; Look = look;
+            NX = x;NY = y;
             Visible = visible;
 
         }
@@ -114,7 +133,7 @@ namespace GameEngine
 
         public static bool Made_Obj(string name, int x, int y, int sx, int sy, char[,] look) //创建物体
         {
-            if (sx <= 0 || sy <= 0 || Window.All_Obj.Count > Max_Objs)
+            if (sx <= 0 || sy <= 0 || Window.All_Obj.ContainsKey(name) || Window.All_Obj.Count > Max_Objs)
             {
                 return false;
             }
@@ -139,14 +158,19 @@ namespace GameEngine
             else
             {
                 Window.All_Obj[name].Add_Physics(weight, vx, vy, fx, fy, elastic, friction);
+                Window.All_Obj[name].Judge_Speed();
+                Window.All_Obj[name].Judge_Visible();
 
                 return true;
             }
         }
         public static void Change_Obj_Physics_S(string name, bool Movable = true, bool Collisible = true)
         {
-            Window.All_Obj[name].Movable = Movable;
-            Window.All_Obj[name].Collisible = Collisible;
+            if (Window.All_Obj.ContainsKey(name))
+            {
+                Window.All_Obj[name].Movable = Movable;
+                Window.All_Obj[name].Collisible = Collisible;
+            }
         }
 
     }
@@ -400,17 +424,25 @@ namespace GameEngine
         }
 
         //静态创建方法
+        public readonly static int Max_SpliceObjs = 20;//最大组合体数
         public static bool Made_Obj(string name, params string[] oBJs) //创建物体
         {
-
-            if (Window.Add_SpliceObj(name, new SpliceOBJ(name, oBJs)))
-            {
-                return true;
-            }
-            else
+            if (Window.All_SpliceOBJ.Count > Max_SpliceObjs || Window.All_SpliceOBJ.ContainsKey(name))
             {
                 return false;
             }
+            else
+            {
+                if (Window.Add_SpliceObj(name, new SpliceOBJ(name, oBJs)))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            
 
         }
         public static bool Change_Obj_Physics(string name, float weight = 1, float vx = 0, float vy = 0, float fx = 0, float fy = 0, float elastic = 1, float friction = 0) //物体物理性质
@@ -422,14 +454,19 @@ namespace GameEngine
             else
             {
                 Window.All_SpliceOBJ[name].Add_Physics(weight, vx, vy, fx, fy, elastic, friction);
+                Window.All_SpliceOBJ[name].Judge_Speed();
+                Window.All_SpliceOBJ[name].Judge_Visible();
 
                 return true;
             }
         }
         public static void Change_Obj_Physics_S(string name, bool Movable = true, bool Collisible = true)
         {
-            Window.All_SpliceOBJ[name].Movable = Movable;
-            Window.All_SpliceOBJ[name].Collisible = Collisible;
+            if (Window.All_SpliceOBJ.ContainsKey(name))
+            {
+                Window.All_SpliceOBJ[name].Movable = Movable;
+                Window.All_SpliceOBJ[name].Collisible = Collisible;
+            }
         }
 
     }

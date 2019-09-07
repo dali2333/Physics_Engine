@@ -96,8 +96,8 @@ namespace GameEngine
         }
 
         //游戏体
-        public static Dictionary<string,GameOBJ> All_Obj = new Dictionary<string, GameOBJ>(10); //所有物体
-        public static Dictionary<string, SpliceOBJ> All_SpliceOBJ = new Dictionary<string, SpliceOBJ>(10); //所有组合体
+        public static readonly Dictionary<string,GameOBJ> All_Obj = new Dictionary<string, GameOBJ>(GameOBJ.Max_Objs); //所有物体
+        public static readonly Dictionary<string, SpliceOBJ> All_SpliceOBJ = new Dictionary<string, SpliceOBJ>(SpliceOBJ.Max_SpliceObjs); //所有组合体
         public static bool Add_Obj(string name,GameOBJ obj)
         {
             try

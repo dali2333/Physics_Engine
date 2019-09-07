@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Media;
 using System.Text;
@@ -36,7 +37,15 @@ namespace GameEngine
 
         public static void Loading(string path="")
         {
-            Music_Path = path;
+            if (Directory.Exists(path))
+            {
+                Music_Path = path;
+            }
+            else
+            {
+                throw new Exception("路径不存在");
+            }
+            
         }
     }
 }

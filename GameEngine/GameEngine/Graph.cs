@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -425,7 +426,15 @@ namespace GameEngine
         //高级方法
         public static void Loading(string path="") //输入path后每次调用都以该目录为基准，不然每次用全局路径也行
         {
-            Graph_Path = path;
+            if (Directory.Exists(path))
+            {
+                Graph_Path = path;
+            }
+            else
+            {
+                throw new Exception("路径不存在");
+            }
+                
         }
         public static void Add_File_To_Graphs(string name) //将文件中的图片添加到缓存中
         {

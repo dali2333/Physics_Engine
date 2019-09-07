@@ -98,10 +98,18 @@ namespace GameEngine
                 Is_Land = true;
             }
 
+            if (rc1.Name == "A" && rc2.Name == "FL")
+            {
+                Graph.Add_String(Graph.All_Graphs["V"], "        ");
+                Graph.Add_String(Graph.All_Graphs["V"], "AAAAA");
+
+            }
+
         }
         static void Out_Border(GameOBJ rc1) //物体超出边界事件
         {
-            
+            //Graph.Add_String(Graph.All_Graphs["V"], "        "); Graph.Add_String(Graph.All_Graphs["V"], "OUT");
+
         }
         static void Alarm(long t,long real_t) //闹钟事件 t是设置的时间,real_t是实际触发的时间
         {
@@ -236,53 +244,53 @@ namespace GameEngine
             //Window.Change_BackGround(v); //安全更改背景
             //Window.Add_To_BackGround(v,20,20);//将图片添加到背景中
 
+            //设置物理环境
+            Physics.Global_GY = 80; //全局重力
+            Physics.Global_GX = 0;
+            Physics.Global_Max_Speed = 1000; //全局最大速度
+
             //载入物体 两者碰撞,弹力求和
-            float Elastic = 0.4f; float Friction = 0.5f; //直接Change_Obj_Physics带数就行,这里是为了方便
+            float Elastic = 0.49f; float Friction = 0.5f; //直接Change_Obj_Physics带数就行,这里是为了方便
 
             //用于显示文字的标签
             GameOBJ.Made_Obj("O", 0, 0, 8, 1, Graph.All_Graphs["V"]); GameOBJ.Change_Obj_Physics_S("O", false, false);
             //物体
-            GameOBJ.Made_Obj("A", 20, 20, 3, 3, Graph.All_Graphs["l"]); //外观和形状
-            GameOBJ.Change_Obj_Physics("A", 1f, 0, 0, 0, 0, Elastic, Friction);//物理性质
+            GameOBJ.Made_Obj("A", 50, 20, 3, 3, Graph.All_Graphs["l"]); //外观和形状
+            GameOBJ.Change_Obj_Physics("A", 1f, -10, 10, 0, 0, Elastic, Friction);//物理性质
             GameOBJ.Change_Obj_Physics_S("A", true, true);//可移动性和可碰撞性开关
 
-            GameOBJ.Made_Obj("B", 25, 23, 3, 3, Graph.All_Graphs["l"]);
-            GameOBJ.Change_Obj_Physics("B", 1f, 0, 0, 0, 0, Elastic, Friction);
-            GameOBJ.Change_Obj_Physics_S("B", true, true);
+            //GameOBJ.Made_Obj("B", 40, 30, 3, 3, Graph.All_Graphs["l2"]);
+            //GameOBJ.Change_Obj_Physics("B", 1f, 0, 0, 0, 0, Elastic, Friction);
+            //GameOBJ.Change_Obj_Physics_S("B", true, true);
 
-            GameOBJ.Made_Obj("C", 60, 21, 3, 3, Graph.All_Graphs["l2"]);
-            GameOBJ.Change_Obj_Physics("C", 1f, -20, 0, 0, 0, Elastic, Friction);
-            GameOBJ.Change_Obj_Physics_S("C", true, true);
+            //GameOBJ.Made_Obj("C", 65, 20, 3, 3, Graph.All_Graphs["l2"]);
+            //GameOBJ.Change_Obj_Physics("C", 1f, -15, 0, 0, 0, Elastic, Friction);
+            //GameOBJ.Change_Obj_Physics_S("C", true, true);
 
-            GameOBJ.Made_Obj("D", 30, 20, 3, 3, Graph.All_Graphs["l3"]); GameOBJ.Change_Obj_Physics("D", 1f, 0, 0, 0, 0, Elastic, Friction); GameOBJ.Change_Obj_Physics_S("D", true, true);
-            GameOBJ.Made_Obj("E", 50, 30, 3, 3, Graph.All_Graphs["l4"]); GameOBJ.Change_Obj_Physics("E", 1, -10, -10, 0, 0, Elastic, Friction); GameOBJ.Change_Obj_Physics_S("E", true, true);
-            GameOBJ.Made_Obj("F", 80, 17, 3, 3, Graph.All_Graphs["l7"]); GameOBJ.Change_Obj_Physics("F", 1, -10, -10, 0, 0, Elastic, Friction); GameOBJ.Change_Obj_Physics_S("F", true, true);
-            GameOBJ.Made_Obj("G", 10, 17, 3, 2, Graph.All_Graphs["l8"]); GameOBJ.Change_Obj_Physics("G", 1, 30, 0, 0, 0, Elastic, Friction); GameOBJ.Change_Obj_Physics_S("G", true, true);
-            //GameOBJ.Made_Obj("H", 90, 35, 2, 1, Graph.All_Graphs["l9"]); GameOBJ.Change_Obj_Physics("H", 1, -5, -5, 0, 0, Elastic, Friction); GameOBJ.Change_Obj_Physics_S("H", true, true);
+            GameOBJ.Made_Obj("D", 48, 30, 3, 3, Graph.All_Graphs["l3"]); GameOBJ.Change_Obj_Physics("D", 1f, 0, 60, 0, 0, Elastic, Friction); GameOBJ.Change_Obj_Physics_S("D", true, true);
+            GameOBJ.Made_Obj("E", 50, 30, 3, 3, Graph.All_Graphs["l4"]); GameOBJ.Change_Obj_Physics("E", 1, -10, 10, 0, 0, Elastic, Friction); GameOBJ.Change_Obj_Physics_S("E", true, true);
+            GameOBJ.Made_Obj("F", 80, 17, 3, 3, Graph.All_Graphs["l7"]); GameOBJ.Change_Obj_Physics("F", 1, -10, 0, 0, 0, Elastic, Friction); GameOBJ.Change_Obj_Physics_S("F", true, true);
+            GameOBJ.Made_Obj("G", 10, 17, 3, 2, Graph.All_Graphs["l8"]); GameOBJ.Change_Obj_Physics("G", 1, 30, 20, 0, 0, Elastic, Friction); GameOBJ.Change_Obj_Physics_S("G", true, true);
+            GameOBJ.Made_Obj("H", 90, 35, 2, 1, Graph.All_Graphs["l9"]); GameOBJ.Change_Obj_Physics("H", 1, -5, 0, 0, 0, Elastic, Friction); GameOBJ.Change_Obj_Physics_S("H", true, true);
             GameOBJ.Made_Obj("I", 30, 30, 4, 4, Graph.All_Graphs["l10"]); GameOBJ.Change_Obj_Physics("I", 5f, 10, -15, 0, 0, Elastic, Friction); GameOBJ.Change_Obj_Physics_S("I", true, true);
 
-            GameOBJ.Made_Obj("FU", 10, 10, 100, 2, Graph.All_Graphs["l5"]); GameOBJ.Change_Obj_Physics("FU", 1, 0, 0, 0, 0, 0.5f, 0); GameOBJ.Change_Obj_Physics_S("FU", false, true);
-            GameOBJ.Made_Obj("FD", 10, 40, 100, 2, Graph.All_Graphs["l5"]); GameOBJ.Change_Obj_Physics("FD", 1, 0, 0, 0, 0, 0.5f, 0); GameOBJ.Change_Obj_Physics_S("FD", false, true);
-            GameOBJ.Made_Obj("FL", 7, 10, 3, 32, Graph.All_Graphs["l6"]); GameOBJ.Change_Obj_Physics("FL", 1, 0, 0, 0, 0, 0.5f, 0); GameOBJ.Change_Obj_Physics_S("FL", false, true);
-            GameOBJ.Made_Obj("FR", 110, 10, 3, 32, Graph.All_Graphs["l6"]); GameOBJ.Change_Obj_Physics("FR", 1, 0, 0, 0, 0, 0.5f, 0); GameOBJ.Change_Obj_Physics_S("FR", false, true);
+            GameOBJ.Made_Obj("FU", 10, 10, 100, 2, Graph.All_Graphs["l5"]); GameOBJ.Change_Obj_Physics("FU", 1, 0, 0, 0, 0, Elastic, 0); GameOBJ.Change_Obj_Physics_S("FU", false, true);
+            GameOBJ.Made_Obj("FD", 10, 40, 100, 2, Graph.All_Graphs["l5"]); GameOBJ.Change_Obj_Physics("FD", 1, 0, 0, 0, 0, Elastic, 0); GameOBJ.Change_Obj_Physics_S("FD", false, true);
+            GameOBJ.Made_Obj("FL", 7, 10, 3, 32, Graph.All_Graphs["l6"]); GameOBJ.Change_Obj_Physics("FL", 1, 0, 0, 0, 0, Elastic, 0); GameOBJ.Change_Obj_Physics_S("FL", false, true);
+            GameOBJ.Made_Obj("FR", 110, 10, 3, 32, Graph.All_Graphs["l6"]); GameOBJ.Change_Obj_Physics("FR", 1, 0, 0, 0, 0, Elastic, 0); GameOBJ.Change_Obj_Physics_S("FR", false, true);
 
             //组合体 创建完物体后可以绑定为组合体,物理性质不修改(不能调用Change_Obj_Physics)将保留原来的
             //绑定为组合体后,单独修改某个内部物体的速度、受力等属性是不生效的(重量需调用Change_Weight_When_Spliced)
             //SpliceOBJ类的全部属性方法都和GameOBJ一一对应,直接调用可整体修改 例:Window.All_SpliceOBJ["HH"].Speed_X = 10;
-            SpliceOBJ.Made_Obj("HH", "A", "B");//名称,后接绑定物体的名称(最多添加SpliceOBJ.Max_Splice个)
-            SpliceOBJ.Change_Obj_Physics("HH", 1f, 0, -30, 0, 0, Elastic, Friction);//物理性质(所有内部物体同时修改)
-            SpliceOBJ.Change_Obj_Physics_S("HH", true, true);//可移动性和可碰撞性开关(所有内部物体同时修改)
+            //SpliceOBJ.Made_Obj("HH", "A", "B");//名称,后接绑定物体的名称(最多添加SpliceOBJ.Max_Splice个)
+            //SpliceOBJ.Change_Obj_Physics("HH", 1f, 0, -30, 0, 0, Elastic, Friction);//物理性质(所有内部物体同时修改)
+            //SpliceOBJ.Change_Obj_Physics_S("HH", true, true);//可移动性和可碰撞性开关(所有内部物体同时修改)
 
             //Window.All_SpliceOBJ["HH"].Stop_Splice("B"); //绑定
             //Window.All_SpliceOBJ["HH"].Start_Splice("C");//解绑
 
-            //设置物理环境
-            Physics.Global_GY = 40; //全局重力
-            Physics.Global_GX = 0;
-            Physics.Global_Max_Speed = 40; //全局最大速度
-
             //键盘绑定物体
-            KeyBoard.Control_Obj("A"); //参数是被控制物体的名称
+            //KeyBoard.Control_Obj("A"); //参数是被控制物体的名称
             //KeyBoard.Stop_Control_Obj();//解绑物体
             //KeyBoard.KeyBoard_Delay=10;//按键后延迟ms
 
@@ -337,7 +345,7 @@ namespace GameEngine
         {
             /// ! 开始运行 ! ///
 
-            //Thread.Sleep(1000); //正式启动前最好暂停一小会等待数据加载
+            //Thread.Sleep(500); //正式启动前最好暂停一小会等待数据加载
 
             //演示一段预渲染画面,按Esc跳过
             //Parallel.Invoke(() => Window.Show_Prerendered_Frame("Prerendered_Frame1.txt", 10, "Press esc to exit..."), () => KeyBoard.Start_Up());
